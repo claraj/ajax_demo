@@ -1,19 +1,23 @@
 var express = require('express');
 var router = express.Router();
+var places;
 
+router.get('/', function(req, res) {
 
 // "Database". Names of places, and whether the user has visited it or not.
+req.db.collection('places').distinct(function(err, data){
+if (err){
+	console.log("error connection to database");
+}//end of if error
+else{//no error, get data
 
-var places = [
-{id: "1", name: "Rome", visited: true},
-{id: "2", name: "New York", visited: false},
-{id: "3", name: "Tokyo", visited: false}
-];
-var counter = places.length;
+places = data;
+//{id: "3", name: "Tokyo", visited: false}
+}//end of else, no errors
+
 
 
 /* GET home page. */
-router.get('/', function(req, res) {
   res.render('index', { title: 'Travel Wish List', places : places });
 });
 
@@ -88,5 +92,6 @@ router.delete('/delete', function(req, res){
 });
 
 
+});//end of database callback
 
 module.exports = router;
