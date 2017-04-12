@@ -1,25 +1,41 @@
 var express = require('express');
 var router = express.Router();
 var places;
+var counter=1;
 
 router.get('/', function(req, res) {
 
+
 // "Database". Names of places, and whether the user has visited it or not.
-req.db.collection('places').distinct(function(err, data){
+
+req.db.collection('places').find(function(err, data){
+
 if (err){
-	console.log("error connection to database");
+
+console.log("error connection to database");
+
+return next(err);
+
 }//end of if error
+
 else{//no error, get data
 
+//I think this is the problem, data is a Mongo cursor object
 places = data;
+
 //{id: "3", name: "Tokyo", visited: false}
+
+return res.render('index', { title: 'Travel Wish List', places : places });
+
 }//end of else, no errors
+
 
 
 
 /* GET home page. */
   res.render('index', { title: 'Travel Wish List', places : places });
-});
+
+  });
 
 
 /* GET all items home page. */
@@ -29,22 +45,39 @@ router.get('/all', function(req, res) {
 
 
 /* POST - add a new location */
-router.post('/add', function(req, res) {
+router.post('/addNewPlace', function(req, res) {
+//var filter = {id: req.body.id, name: req.body.name, visited: req.body.visited}
+var filter = {name: req.body.name}
+  var array =[];
+  //credit for following http://stackoverflow.com/questions/32531204/cannot-access-mongodb-object-in-array-returns-undefined
+  req.db.collection('places').find(filter).toArray(function(err,data){
+    array=data;
+	console.log("array length is "+array.length);
 
-  var name = req.body.name;
-  var place = { 'id': ++counter + "" , 'name': name, 'visited': false };
 
-  places.push(place);
+  if (array.length == 0)
+  {
+  req.db.collection('places').insertOne(req.body, function(err){
+    if (err) {
+      return next(err);
+    }
 
-  console.log('After POST, the places list is');
-  console.log(places);
-
-  res.status(201);      // Created
-  res.json(place);      // Send new object data back as JSON, if needed.
-
-  // TODO may want to check if place already in list and don't add.
+	return res.redirect('/');
 
 });
+}
+  else
+  {
+      return res.send('place already exists')
+
+  }
+
+  // });
+
+
+
+})  ;//end of post
+});//end of insertOne
 
 
 /* PUT - update whether a place has been visited or not */
