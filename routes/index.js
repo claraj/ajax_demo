@@ -3,8 +3,6 @@ var router = express.Router();
 var places;
 var counter=1;
 
-router.get('/', function(req, res) {
-
 
 router.get('/', function(req, res) {
   res.render('index', { title: 'Travel Wish List'} );
@@ -14,6 +12,7 @@ router.get('/', function(req, res) {
 /* GET all items home page. */
 router.get('/all', function(req, res) {
 
+console.log('all')
   req.db.collection('places').find().toArray(function(err, data){
 
   if (err){
@@ -25,15 +24,11 @@ router.get('/all', function(req, res) {
 
   console.log(data)
   places = data;
-  res.json(places);
+  return res.json(places);
 
   }//end of else, no errors
 
 });
-
-/* GET all items home page. */
-router.get('/all', function(req, res) {
-  res.json(places);
 });
 
 
@@ -42,7 +37,7 @@ router.post('/addNewPlace', function(req, res) {
 //var filter = {id: req.body.id, name: req.body.name, visited: req.body.visited}
 var filter = {name: req.body.name}
   var array =[];
-  //credit for following http://stackoverflow.com/questions/32531204/cannot-access-mongodb-object-in-array-returns-undefined
+//   //credit for following http://stackoverflow.com/questions/32531204/cannot-access-mongodb-object-in-array-returns-undefined
   req.db.collection('places').find(filter).toArray(function(err,data){
     array=data;
 	console.log("array length is "+array.length);
@@ -64,8 +59,6 @@ var filter = {name: req.body.name}
       return res.send('place already exists')
 
   }
-
-  // });
 
 
 
@@ -117,6 +110,6 @@ router.delete('/delete', function(req, res){
 
 });
 
-});//end of database callback
-});
+//});//end of database callback
+
 module.exports = router;
