@@ -6,37 +6,30 @@ var counter=1;
 router.get('/', function(req, res) {
 
 
-// "Database". Names of places, and whether the user has visited it or not.
-
-req.db.collection('places').find(function(err, data){
-
-if (err){
-
-console.log("error connection to database");
-
-return next(err);
-
-}//end of if error
-
-else{//no error, get data
-
-//I think this is the problem, data is a Mongo cursor object
-places = data;
-
-//{id: "3", name: "Tokyo", visited: false}
-
-return res.render('index', { title: 'Travel Wish List', places : places });
-
-}//end of else, no errors
+router.get('/', function(req, res) {
+  res.render('index', { title: 'Travel Wish List'} );
+});
 
 
+/* GET all items home page. */
+router.get('/all', function(req, res) {
 
+  req.db.collection('places').find().toArray(function(err, data){
 
-/* GET home page. */
-  res.render('index', { title: 'Travel Wish List', places : places });
+  if (err){
+  console.log("error connection to database");
+  return next(err);
+  }//end of if error
 
-  });
+  else{//no error, get data
 
+  console.log(data)
+  places = data;
+  res.json(places);
+
+  }//end of else, no errors
+
+});
 
 /* GET all items home page. */
 router.get('/all', function(req, res) {
@@ -124,7 +117,6 @@ router.delete('/delete', function(req, res){
 
 });
 
-
 });//end of database callback
-
+});
 module.exports = router;
