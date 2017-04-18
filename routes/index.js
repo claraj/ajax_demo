@@ -33,7 +33,7 @@ console.log('all')
 
 
 /* POST - add a new location */
-router.post('/addNewPlace', function(req, res) {
+router.post('/add', function(req, res) {
 //var filter = {id: req.body.id, name: req.body.name, visited: req.body.visited}
 var filter = {name: req.body.name}
   var array =[];
@@ -45,25 +45,27 @@ var filter = {name: req.body.name}
 
   if (array.length == 0)
   {
+  req.body.visited=false
   req.db.collection('places').insertOne(req.body, function(err){
     if (err) {
       return next(err);
     }
 
-	return res.redirect('/');
+	return res.json(req.body);
 
 });
 }
   else
   {
-      return res.send('place already exists')
-
+      return res.json({key: false});
   }
 
 
 
 })  ;//end of post
 });//end of insertOne
+
+
 
 
 /* PUT - update whether a place has been visited or not */
@@ -90,24 +92,16 @@ router.put('/update', function(req, res){
 
 router.delete('/delete', function(req, res){
 
-  var place_id = req.body.id;
-  console.log(place_id);
-
-  for (var i = 0 ; i < places.length ; i++) {
-    var place = places[i];
-    if (place.id == place_id) {
-      places.splice(i, 1);  //Delete the element at this position
-      res.json(place);
-      break;
-    }
-  }
-
+  var place_id = req.body._id;
+  
+req.db.collection('places').deleteOne({id: place_id}, function(err){
+  console.log("Place deleted: "+place_id);
   console.log('After DELETE, the places list is');
   console.log(places);
 
   res.status(200);
   res.end();
-
+});
 });
 
 //});//end of database callback
